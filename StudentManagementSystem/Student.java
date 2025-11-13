@@ -1,6 +1,9 @@
 /**
  * A simple class to represent a student.
  * It holds the student's ID, name, and grade.
+ *
+ * @author Jules
+ * @version 1.0
  */
 public class Student {
     private int id;
@@ -9,8 +12,9 @@ public class Student {
 
     /**
      * Constructor for the Student class.
-     * @param id The student's ID.
-     * @param name The student's name.
+     *
+     * @param id    The student's ID.
+     * @param name  The student's name.
      * @param grade The student's grade.
      */
     public Student(int id, String name, String grade) {
@@ -21,6 +25,7 @@ public class Student {
 
     /**
      * Gets the student's ID.
+     *
      * @return The student's ID.
      */
     public int getId() {
@@ -29,6 +34,7 @@ public class Student {
 
     /**
      * Gets the student's name.
+     *
      * @return The student's name.
      */
     public String getName() {
@@ -37,6 +43,7 @@ public class Student {
 
     /**
      * Gets the student's grade.
+     *
      * @return The student's grade.
      */
     public String getGrade() {
@@ -45,6 +52,7 @@ public class Student {
 
     /**
      * Returns a string representation of the student.
+     *
      * @return A string containing the student's details.
      */
     @Override

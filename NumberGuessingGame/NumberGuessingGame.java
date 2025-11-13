@@ -7,27 +7,38 @@ import java.util.List;
 /**
  * An enhanced number guessing game with multiple difficulty levels,
  * scoring system, statistics tracking, and advanced hint system.
+ *
+ * @author Jules
+ * @version 1.0
  */
 public class NumberGuessingGame {
-    
+
     // Game statistics
     private static int totalGamesPlayed = 0;
     private static int totalGamesWon = 0;
     private static int bestScore = Integer.MAX_VALUE;
     private static List<Integer> scoreHistory = new ArrayList<>();
-    
+
     // Difficulty settings
     private enum Difficulty {
         EASY(1, 50, 10, "Easy"),
         MEDIUM(1, 100, 7, "Medium"),
         HARD(1, 500, 12, "Hard"),
         EXPERT(1, 1000, 15, "Expert");
-        
+
         final int min;
         final int max;
         final int maxAttempts;
         final String name;
-        
+
+        /**
+         * Constructor for the Difficulty enum.
+         *
+         * @param min          The minimum number in the range.
+         * @param max          The maximum number in the range.
+         * @param maxAttempts The maximum number of attempts allowed.
+         * @param name         The name of the difficulty level.
+         */
         Difficulty(int min, int max, int maxAttempts, String name) {
             this.min = min;
             this.max = max;
@@ -35,43 +46,45 @@ public class NumberGuessingGame {
             this.name = name;
         }
     }
-    
+
     /**
      * The main method that runs the game.
+     *
+     * @param args Command-line arguments (not used).
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean playAgain = true;
-        
+
         printWelcome();
-        
+
         while (playAgain) {
             try {
                 // Select difficulty
                 Difficulty difficulty = selectDifficulty(scanner);
-                
+
                 // Play one round
                 playRound(scanner, difficulty);
-                
+
                 // Update statistics
                 totalGamesPlayed++;
-                
+
                 // Ask to play again
                 playAgain = askToPlayAgain(scanner);
-                
+
             } catch (Exception e) {
                 System.out.println("❌ An unexpected error occurred: " + e.getMessage());
                 scanner.nextLine(); // Clear buffer
             }
         }
-        
+
         // Print final statistics
         printFinalStatistics();
-        
+
         System.out.println("\n✨ Thank you for playing! Goodbye! ✨");
         scanner.close();
     }
-    
+
     /**
      * Print welcome message.
      */
@@ -83,9 +96,12 @@ public class NumberGuessingGame {
         System.out.println("💡 Hints: You'll get progressive hints based on your guesses.");
         System.out.println("⭐ Score: Lower attempts = Better score!\n");
     }
-    
+
     /**
      * Select difficulty level.
+     *
+     * @param scanner The Scanner object to read user input.
+     * @return The selected difficulty level.
      */
     private static Difficulty selectDifficulty(Scanner scanner) {
         System.out.println("\n━━━━━━━━━━━━━ SELECT DIFFICULTY ━━━━━━━━━━━━━");
@@ -94,18 +110,22 @@ public class NumberGuessingGame {
         System.out.println("3. 🔴 Hard   (1-500,  Max 12 attempts)");
         System.out.println("4. 💀 Expert (1-1000, Max 15 attempts)");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        
+
         while (true) {
             try {
                 System.out.print("\nEnter your choice (1-4): ");
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Clear buffer
-                
+
                 switch (choice) {
-                    case 1: return Difficulty.EASY;
-                    case 2: return Difficulty.MEDIUM;
-                    case 3: return Difficulty.HARD;
-                    case 4: return Difficulty.EXPERT;
+                    case 1:
+                        return Difficulty.EASY;
+                    case 2:
+                        return Difficulty.MEDIUM;
+                    case 3:
+                        return Difficulty.HARD;
+                    case 4:
+                        return Difficulty.EXPERT;
                     default:
                         System.out.println("⚠️ Invalid choice. Please select 1-4.");
                 }
@@ -115,9 +135,12 @@ public class NumberGuessingGame {
             }
         }
     }
-    
+
     /**
      * Play one round of the game.
+     *
+     * @param scanner    The Scanner object to read user input.
+     * @param difficulty The selected difficulty level.
      */
     private static void playRound(Scanner scanner, Difficulty difficulty) {
         Random random = new Random();
@@ -125,7 +148,7 @@ public class NumberGuessingGame {
         int numberOfTries = 0;
         boolean hasGuessedCorrectly = false;
         int previousGuess = -1;
-        
+
         System.out.println("\n╔══════════════════════════════════════════════╗");
         System.out.println("║              🎮 NEW GAME STARTED 🎮          ║");
         System.out.println("╚══════════════════════════════════════════════╝");
@@ -133,14 +156,14 @@ public class NumberGuessingGame {
         System.out.println("🎯 Range: " + difficulty.min + " - " + difficulty.max);
         System.out.println("🎫 Maximum Attempts: " + difficulty.maxAttempts);
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        
+
         // Game loop
         while (!hasGuessedCorrectly && numberOfTries < difficulty.maxAttempts) {
             try {
                 // Get user guess with validation
                 int userGuess = getUserGuess(scanner, difficulty, numberOfTries + 1, difficulty.maxAttempts);
                 numberOfTries++;
-                
+
                 // Check if guess is correct
                 if (userGuess == numberToGuess) {
                     hasGuessedCorrectly = true;
@@ -151,13 +174,13 @@ public class NumberGuessingGame {
                     provideHints(userGuess, numberToGuess, previousGuess, numberOfTries, difficulty);
                     previousGuess = userGuess;
                 }
-                
+
             } catch (InputMismatchException e) {
                 System.out.println("⚠️ Invalid input. Please enter a valid number.");
                 scanner.nextLine(); // Clear buffer
             }
         }
-        
+
         // Check if player ran out of attempts
         if (!hasGuessedCorrectly) {
             System.out.println("\n💔 Game Over! You've used all " + difficulty.maxAttempts + " attempts.");
@@ -165,50 +188,63 @@ public class NumberGuessingGame {
             updateStatistics(numberOfTries, false);
         }
     }
-    
+
     /**
      * Get validated user guess.
+     *
+     * @param scanner        The Scanner object to read user input.
+     * @param difficulty     The selected difficulty level.
+     * @param currentAttempt The current attempt number.
+     * @param maxAttempts    The maximum number of attempts allowed.
+     * @return The user's guess.
      */
     private static int getUserGuess(Scanner scanner, Difficulty difficulty, int currentAttempt, int maxAttempts) {
         while (true) {
             System.out.print("🎯 Attempt " + currentAttempt + "/" + maxAttempts + " - Enter your guess: ");
-            
+
             if (!scanner.hasNextInt()) {
-                System.out.println("⚠️ Invalid input. Please enter a number between " + 
-                                 difficulty.min + " and " + difficulty.max + ".");
+                System.out.println("⚠️ Invalid input. Please enter a number between " +
+                        difficulty.min + " and " + difficulty.max + ".");
                 scanner.next(); // Clear invalid input
                 continue;
             }
-            
+
             int guess = scanner.nextInt();
-            
+
             // Validate range
             if (guess < difficulty.min || guess > difficulty.max) {
-                System.out.println("⚠️ Out of range! Please enter a number between " + 
-                                 difficulty.min + " and " + difficulty.max + ".");
+                System.out.println("⚠️ Out of range! Please enter a number between " +
+                        difficulty.min + " and " + difficulty.max + ".");
+                scanner.nextLine(); // Consume the rest of the line
                 continue;
             }
-            
+
             return guess;
         }
     }
-    
+
     /**
      * Provide progressive hints based on distance and attempt number.
+     *
+     * @param guess         The user's guess.
+     * @param target        The number to guess.
+     * @param previousGuess The user's previous guess.
+     * @param attempts      The current attempt number.
+     * @param difficulty    The selected difficulty level.
      */
-    private static void provideHints(int guess, int target, int previousGuess, 
-                                     int attempts, Difficulty difficulty) {
+    private static void provideHints(int guess, int target, int previousGuess,
+            int attempts, Difficulty difficulty) {
         int distance = Math.abs(guess - target);
         int range = difficulty.max - difficulty.min;
         double percentageOff = (distance * 100.0) / range;
-        
+
         // Basic high/low hint
         if (guess < target) {
             System.out.print("📈 Too low! ");
         } else {
             System.out.print("📉 Too high! ");
         }
-        
+
         // Distance-based hints
         if (percentageOff <= 2) {
             System.out.print("🔥 BURNING HOT! ");
@@ -223,7 +259,7 @@ public class NumberGuessingGame {
         } else {
             System.out.print("⛄ Very cold! ");
         }
-        
+
         // Progression hints (getting closer/farther)
         if (previousGuess != -1) {
             int previousDistance = Math.abs(previousGuess - target);
@@ -235,25 +271,28 @@ public class NumberGuessingGame {
                 System.out.print("↔️ Same distance.");
             }
         }
-        
+
         System.out.println();
-        
+
         // Extra hint after multiple attempts
         if (attempts >= difficulty.maxAttempts / 2) {
             int hint = target / 10 * 10; // Round to nearest 10
             System.out.println("💡 Hint: The number is in the " + hint + "s range.");
         }
     }
-    
+
     /**
      * Print victory message with performance rating.
+     *
+     * @param attempts   The number of attempts it took to guess the number.
+     * @param difficulty The selected difficulty level.
      */
     private static void printVictory(int attempts, Difficulty difficulty) {
         System.out.println("\n╔══════════════════════════════════════════════╗");
         System.out.println("║          🎉 CONGRATULATIONS! 🎉              ║");
         System.out.println("╚══════════════════════════════════════════════╝");
         System.out.println("✅ You guessed the number in " + attempts + " attempts!");
-        
+
         // Performance rating
         String rating;
         String emoji;
@@ -273,20 +312,23 @@ public class NumberGuessingGame {
             rating = "LUCKY";
             emoji = "🍀";
         }
-        
+
         System.out.println(emoji + " Performance: " + rating + " " + emoji);
-        
+
         // Check for new best score
         if (attempts < bestScore) {
             bestScore = attempts;
             System.out.println("🎊 NEW BEST SCORE! 🎊");
         }
-        
+
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
-    
+
     /**
      * Update game statistics.
+     *
+     * @param attempts The number of attempts it took to guess the number.
+     * @param won      True if the game was won, false otherwise.
      */
     private static void updateStatistics(int attempts, boolean won) {
         if (won) {
@@ -297,9 +339,12 @@ public class NumberGuessingGame {
             }
         }
     }
-    
+
     /**
      * Ask if player wants to play again.
+     *
+     * @param scanner The Scanner object to read user input.
+     * @return True if the player wants to play again, false otherwise.
      */
     private static boolean askToPlayAgain(Scanner scanner) {
         System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -307,33 +352,34 @@ public class NumberGuessingGame {
         String response = scanner.nextLine().trim().toLowerCase();
         return response.startsWith("y");
     }
-    
+
     /**
      * Print final statistics.
      */
     private static void printFinalStatistics() {
-        if (totalGamesPlayed == 0) return;
-        
+        if (totalGamesPlayed == 0)
+            return;
+
         System.out.println("\n╔══════════════════════════════════════════════╗");
         System.out.println("║           📊 GAME STATISTICS 📊              ║");
         System.out.println("╚══════════════════════════════════════════════╝");
         System.out.println("🎮 Total Games Played: " + totalGamesPlayed);
         System.out.println("🏆 Games Won: " + totalGamesWon);
         System.out.println("💔 Games Lost: " + (totalGamesPlayed - totalGamesWon));
-        
+
         if (totalGamesWon > 0) {
             double winRate = (totalGamesWon * 100.0) / totalGamesPlayed;
             System.out.println("📈 Win Rate: " + String.format("%.1f", winRate) + "%");
             System.out.println("⭐ Best Score: " + bestScore + " attempts");
-            
+
             // Calculate average score
             double avgScore = scoreHistory.stream()
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0.0);
+                    .mapToInt(Integer::intValue)
+                    .average()
+                    .orElse(0.0);
             System.out.println("📊 Average Score: " + String.format("%.1f", avgScore) + " attempts");
         }
-        
+
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
 }
