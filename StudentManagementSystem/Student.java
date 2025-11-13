@@ -2,6 +2,7 @@
  * A simple class to represent a student.
  * It holds the student's ID, name, and grade.
  *
+ * @author Jules
  * @author Darshil
  * @version 1.0
  */

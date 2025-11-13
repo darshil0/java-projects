@@ -8,6 +8,7 @@ import java.util.Stack;
  * A comprehensive command-line calculator with advanced features including
  * memory functions, history, parentheses support, and scientific operations.
  *
+ * @author Jules
  * @author Darshil
  * @version 2.0
  */
@@ -261,6 +262,19 @@ public class Calculator {
      * @return The result of the evaluation.
      */
     private static double evaluate(String expression) {
+        return new Object() {
+            int pos = -1, ch;
+
+            void nextChar() {
+                ch = (++pos < expression.length()) ? expression.charAt(pos) : -1;
+            }
+
+            boolean eat(int charToEat) {
+                while (ch == ' ')
+                    nextChar();
+                if (ch == charToEat) {
+                    nextChar();
+                    return true;
         Stack<Double> values = new Stack<>();
         Stack<Character> operators = new Stack<>();
 
@@ -278,18 +292,78 @@ public class Calculator {
                         (Character.isDigit(expression.charAt(i)) || expression.charAt(i) == '.')) {
                     sb.append(expression.charAt(i++));
                 }
-                i--;
-                values.push(Double.parseDouble(sb.toString()));
+                return false;
             }
-            // Handle opening parenthesis
-            else if (c == '(') {
-                operators.push(c);
+
+            double parse() {
+                nextChar();
+                double x = parseExpression();
+                if (pos < expression.length())
+                    throw new RuntimeException("Unexpected: " + (char) ch);
+                return x;
             }
-            // Handle closing parenthesis
-            else if (c == ')') {
-                while (!operators.isEmpty() && operators.peek() != '(') {
-                    values.push(applyOperator(operators.pop(), values.pop(), values.pop()));
+
+            // Grammar:
+            // expression = term | expression `+` term | expression `-` term
+            // term = factor | term `*` factor | term `/` factor
+            // factor = `+` factor | `-` factor | `(` expression `)` | number
+            // | function factor
+            double parseExpression() {
+                double x = parseTerm();
+                for (;;) {
+                    if (eat('+'))
+                        x += parseTerm(); // addition
+                    else if (eat('-'))
+                        x -= parseTerm(); // subtraction
+                    else
+                        return x;
                 }
+            }
+
+            double parseTerm() {
+                double x = parseFactor();
+                for (;;) {
+                    if (eat('*'))
+                        x *= parseFactor(); // multiplication
+                    else if (eat('/'))
+                        x /= parseFactor(); // division
+                    else if (eat('%'))
+                        x %= parseFactor(); // modulo
+                    else
+                        return x;
+                }
+            }
+
+            double parseFactor() {
+                if (eat('+'))
+                    return parseFactor(); // unary plus
+                if (eat('-'))
+                    return -parseFactor(); // unary minus
+
+                double x;
+                int startPos = this.pos;
+                if (eat('(')) { // parentheses
+                    x = parseExpression();
+                    eat(')');
+                } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+                    while ((ch >= '0' && ch <= '9') || ch == '.')
+                        nextChar();
+                    x = Double.parseDouble(expression.substring(startPos, this.pos));
+                } else if (ch >= 'a' && ch <= 'z') { // functions
+                    while (ch >= 'a' && ch <= 'z')
+                        nextChar();
+                    String func = expression.substring(startPos, this.pos);
+                    x = parseFactor();
+                    if (func.equals("sqrt"))
+                        x = Math.sqrt(x);
+                    else if (func.equals("sin"))
+                        x = Math.sin(Math.toRadians(x));
+                    else if (func.equals("cos"))
+                        x = Math.cos(Math.toRadians(x));
+                    else if (func.equals("tan"))
+                        x = Math.tan(Math.toRadians(x));
+                    else
+                        throw new RuntimeException("Unknown function: " + func);
                 if (!operators.isEmpty())
                     operators.pop(); // Remove '('
             }
@@ -306,12 +380,17 @@ public class Calculator {
                     i--;
                     values.push(Double.parseDouble(sb.toString()));
                 } else {
-                    while (!operators.isEmpty() && hasPrecedence(c, operators.peek())) {
-                        values.push(applyOperator(operators.pop(), values.pop(), values.pop()));
-                    }
-                    operators.push(c);
+                    throw new RuntimeException("Unexpected: " + (char) ch);
                 }
+
+                if (eat('^'))
+                    x = Math.pow(x, parseFactor()); // exponentiation
+
+                return x;
             }
+        }.parse();
+    }
+
         }
 
         // Apply remaining operators

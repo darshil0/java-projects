@@ -4,6 +4,7 @@ import java.util.Scanner;
 /**
  * A simple console-based student management system.
  *
+ * @author Jules
  * @author Darshil
  * @version 1.0
  */
@@ -35,6 +36,14 @@ public class StudentManagementSystem {
                 System.out.print("Enter your choice: ");
 
                 // Get the user's choice.
+                try {
+                    choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline character
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Invalid choice. Please try again.");
+                    scanner.nextLine(); // Consume the invalid input
+                    continue;
+                }
                 choice = scanner.nextInt();
                 scanner.nextLine(); // Consume the newline character
 
@@ -54,6 +63,14 @@ public class StudentManagementSystem {
                         System.out.println("Current students:");
                         viewStudents(students);
                         System.out.print("Enter the ID of the student to remove: ");
+                    try {
+                        int idToRemove = scanner.nextInt();
+                        students.removeIf(student -> student.getId() == idToRemove);
+                        System.out.println("Student removed successfully.");
+                    } catch (java.util.InputMismatchException e) {
+                        System.out.println("Invalid ID. Please try again.");
+                        scanner.nextLine(); // Consume the invalid input
+                    }
                         int idToRemove = scanner.nextInt();
                         students.removeIf(student -> student.getId() == idToRemove);
                         System.out.println("Student removed successfully.");

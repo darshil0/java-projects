@@ -8,6 +8,7 @@ import java.util.List;
  * An enhanced number guessing game with multiple difficulty levels,
  * scoring system, statistics tracking, and advanced hint system.
  *
+ * @author Jules
  * @author Darshil
  * @version 1.0
  */
@@ -215,6 +216,7 @@ public class NumberGuessingGame {
             if (guess < difficulty.min || guess > difficulty.max) {
                 System.out.println("⚠️ Out of range! Please enter a number between " +
                         difficulty.min + " and " + difficulty.max + ".");
+                scanner.nextLine(); // Consume the rest of the line
                 continue;
             }
 

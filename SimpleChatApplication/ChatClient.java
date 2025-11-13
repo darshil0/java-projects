@@ -8,6 +8,7 @@ import java.util.Scanner;
 /**
  * A simple command-line chat client.
  *
+ * @author Jules
  * @author Darshil
  * @version 1.0
  */
@@ -40,6 +41,16 @@ public class ChatClient {
                     e.printStackTrace();
                 }
             }).start();
+
+            // Create a PrintWriter to send messages to the server
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            // Create a Scanner to read input from the user
+            try (Scanner scanner = new Scanner(System.in)) {
+                // Prompt the user for a username
+                System.out.print("Enter your username: ");
+                String username = scanner.nextLine();
+                out.println(username);
+
 
             // Create a PrintWriter to send messages to the server
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);

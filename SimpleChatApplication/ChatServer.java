@@ -6,6 +6,7 @@ import java.util.*;
  * A simple multi-threaded chat server.
  * When a client connects, it spawns a new thread to handle them.
  *
+ * @author Jules
  * @author Darshil
  * @version 1.0
  */
@@ -70,6 +71,17 @@ public class ChatServer {
                     clientWriters.add(out);
                 }
 
+                // Get a username for this client.
+                String username = in.readLine();
+                if (username == null) {
+                    return;
+                }
+                // Add the client's print writer to the set of all writers so they can receive
+                // messages.
+                synchronized (clientWriters) {
+                    clientWriters.add(out);
+                }
+
                 // Accept messages from this client and broadcast them.
                 while (true) {
                     String input = in.readLine();
@@ -78,7 +90,7 @@ public class ChatServer {
                     }
                     // Broadcast the received message to all other clients
                     for (PrintWriter writer : clientWriters) {
-                        writer.println("MESSAGE " + input);
+                        writer.println("MESSAGE " + username + ": " + input);
                     }
                 }
             } catch (IOException e) {
