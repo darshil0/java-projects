@@ -7,6 +7,7 @@ import java.util.*;
  * When a client connects, it spawns a new thread to handle them.
  *
  * @author Jules
+ * @author Darshil
  * @version 1.0
  */
 public class ChatServer {

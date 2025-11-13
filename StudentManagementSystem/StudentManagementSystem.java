@@ -5,6 +5,7 @@ import java.util.Scanner;
  * A simple console-based student management system.
  *
  * @author Jules
+ * @author Darshil
  * @version 1.0
  */
 public class StudentManagementSystem {
@@ -43,6 +44,8 @@ public class StudentManagementSystem {
                     scanner.nextLine(); // Consume the invalid input
                     continue;
                 }
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
 
                 // Use a switch statement to perform actions based on the user's choice.
                 switch (choice) {
@@ -68,6 +71,9 @@ public class StudentManagementSystem {
                         System.out.println("Invalid ID. Please try again.");
                         scanner.nextLine(); // Consume the invalid input
                     }
+                        int idToRemove = scanner.nextInt();
+                        students.removeIf(student -> student.getId() == idToRemove);
+                        System.out.println("Student removed successfully.");
                         break;
                     case 3:
                         // View all students.

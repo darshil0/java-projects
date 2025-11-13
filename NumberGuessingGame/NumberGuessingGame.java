@@ -9,6 +9,7 @@ import java.util.List;
  * scoring system, statistics tracking, and advanced hint system.
  *
  * @author Jules
+ * @author Darshil
  * @version 1.0
  */
 public class NumberGuessingGame {

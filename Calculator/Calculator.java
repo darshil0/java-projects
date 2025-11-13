@@ -9,6 +9,7 @@ import java.util.Stack;
  * memory functions, history, parentheses support, and scientific operations.
  *
  * @author Jules
+ * @author Darshil
  * @version 2.0
  */
 public class Calculator {
@@ -274,6 +275,22 @@ public class Calculator {
                 if (ch == charToEat) {
                     nextChar();
                     return true;
+        Stack<Double> values = new Stack<>();
+        Stack<Character> operators = new Stack<>();
+
+        for (int i = 0; i < expression.length(); i++) {
+            char c = expression.charAt(i);
+
+            // Skip whitespace
+            if (c == ' ')
+                continue;
+
+            // Handle numbers (including decimals and negatives)
+            if (Character.isDigit(c) || c == '.') {
+                StringBuilder sb = new StringBuilder();
+                while (i < expression.length() &&
+                        (Character.isDigit(expression.charAt(i)) || expression.charAt(i) == '.')) {
+                    sb.append(expression.charAt(i++));
                 }
                 return false;
             }
@@ -347,6 +364,21 @@ public class Calculator {
                         x = Math.tan(Math.toRadians(x));
                     else
                         throw new RuntimeException("Unknown function: " + func);
+                if (!operators.isEmpty())
+                    operators.pop(); // Remove '('
+            }
+            // Handle operators
+            else if (isOperator(c)) {
+                // Handle negative numbers at start or after operators/parentheses
+                if (c == '-' && (i == 0 || expression.charAt(i - 1) == '(' || isOperator(expression.charAt(i - 1)))) {
+                    StringBuilder sb = new StringBuilder("-");
+                    i++;
+                    while (i < expression.length() &&
+                            (Character.isDigit(expression.charAt(i)) || expression.charAt(i) == '.')) {
+                        sb.append(expression.charAt(i++));
+                    }
+                    i--;
+                    values.push(Double.parseDouble(sb.toString()));
                 } else {
                     throw new RuntimeException("Unexpected: " + (char) ch);
                 }
@@ -357,6 +389,43 @@ public class Calculator {
                 return x;
             }
         }.parse();
+    }
+
+        }
+
+        // Apply remaining operators
+        while (!operators.isEmpty()) {
+            values.push(applyOperator(operators.pop(), values.pop(), values.pop()));
+        }
+
+        return values.pop();
+    }
+
+    /**
+     * Check if character is an operator.
+     *
+     * @param c The character to check.
+     * @return True if the character is an operator, false otherwise.
+     */
+    private static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^';
+    }
+
+    /**
+     * Check operator precedence.
+     *
+     * @param op1 The first operator.
+     * @param op2 The second operator.
+     * @return True if op2 has higher or same precedence as op1, false otherwise.
+     */
+    private static boolean hasPrecedence(char op1, char op2) {
+        if (op2 == '(' || op2 == ')')
+            return false;
+        if (op1 == '^')
+            return false; // ^ has highest precedence, right-associative
+        if ((op1 == '*' || op1 == '/' || op1 == '%') && (op2 == '+' || op2 == '-'))
+            return false;
+        return true;
     }
 
     /**
