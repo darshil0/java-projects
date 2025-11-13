@@ -5,6 +5,9 @@ import java.util.*;
 /**
  * A simple multi-threaded chat server.
  * When a client connects, it spawns a new thread to handle them.
+ *
+ * @author Jules
+ * @version 1.0
  */
 public class ChatServer {
     // Port number for the server
@@ -12,6 +15,12 @@ public class ChatServer {
     // Set of all print writers for connected clients, used to broadcast messages.
     private static Set<PrintWriter> clientWriters = new HashSet<>();
 
+    /**
+     * The main method that runs the chat server.
+     *
+     * @param args Command-line arguments (not used).
+     * @throws Exception If an error occurs.
+     */
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running on port " + PORT);
         // Create a new server socket
@@ -37,17 +46,26 @@ public class ChatServer {
         private BufferedReader in;
         private PrintWriter out;
 
+        /**
+         * Constructor for the Handler class.
+         *
+         * @param socket The client socket.
+         */
         public Handler(Socket socket) {
             this.socket = socket;
         }
 
+        /**
+         * The main method for the handler thread.
+         */
         public void run() {
             try {
                 // Initialize input and output streams for the client socket
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                // Add the client's print writer to the set of all writers so they can receive messages.
+                // Add the client's print writer to the set of all writers so they can receive
+                // messages.
                 synchronized (clientWriters) {
                     clientWriters.add(out);
                 }
@@ -75,6 +93,7 @@ public class ChatServer {
                 try {
                     socket.close();
                 } catch (IOException e) {
+                    // Ignore
                 }
             }
         }
