@@ -34,12 +34,12 @@ class Task {
 
     @Override
     public String toString() {
-        String status = completed ? "[✓]" : "[ ]";
+        String status = completed ? "[X]" : "[ ]";
         return String.format("%d. %s %s", id, status, description);
     }
 }
 
-public class TODOList {
+class TODOList {
     private ArrayList<Task> tasks;
     private int nextId;
     private Scanner scanner;
@@ -51,9 +51,13 @@ public class TODOList {
     }
 
     public void addTask(String description) {
-        Task task = new Task(nextId++, description);
+        if (description == null || description.trim().isEmpty()) {
+            System.out.println("X Task description cannot be empty.");
+            return;
+        }
+        Task task = new Task(nextId++, description.trim());
         tasks.add(task);
-        System.out.println("✓ Task added successfully!");
+        System.out.println("Task added successfully!");
     }
 
     public void viewTasks() {
@@ -72,10 +76,14 @@ public class TODOList {
     public void completeTask(int id) {
         Task task = findTaskById(id);
         if (task != null) {
-            task.setCompleted(true);
-            System.out.println("✓ Task marked as completed!");
+            if (task.isCompleted()) {
+                System.out.println("Task is already completed.");
+            } else {
+                task.setCompleted(true);
+                System.out.println("Task marked as completed!");
+            }
         } else {
-            System.out.println("✗ Task not found.");
+            System.out.println("X Task not found.");
         }
     }
 
@@ -83,19 +91,23 @@ public class TODOList {
         Task task = findTaskById(id);
         if (task != null) {
             tasks.remove(task);
-            System.out.println("✓ Task deleted successfully!");
+            System.out.println("Task deleted successfully!");
         } else {
-            System.out.println("✗ Task not found.");
+            System.out.println("X Task not found.");
         }
     }
 
     public void editTask(int id, String newDescription) {
+        if (newDescription == null || newDescription.trim().isEmpty()) {
+            System.out.println("X Task description cannot be empty.");
+            return;
+        }
         Task task = findTaskById(id);
         if (task != null) {
-            task.setDescription(newDescription);
-            System.out.println("✓ Task updated successfully!");
+            task.setDescription(newDescription.trim());
+            System.out.println("Task updated successfully!");
         } else {
-            System.out.println("✗ Task not found.");
+            System.out.println("X Task not found.");
         }
     }
 
@@ -123,44 +135,60 @@ public class TODOList {
     public void run() {
         System.out.println("Welcome to TODO List Manager!");
         
-        while (true) {
-            showMenu();
-            int choice = getIntInput();
+        boolean running = true;
+        while (running) {
+            try {
+                showMenu();
+                int choice = getIntInput();
 
-            switch (choice) {
-                case 1:
-                    System.out.print("Enter task description: ");
-                    String description = scanner.nextLine();
-                    addTask(description);
-                    break;
-                case 2:
-                    viewTasks();
-                    break;
-                case 3:
-                    System.out.print("Enter task ID to complete: ");
-                    int completeId = getIntInput();
-                    completeTask(completeId);
-                    break;
-                case 4:
-                    System.out.print("Enter task ID to edit: ");
-                    int editId = getIntInput();
-                    System.out.print("Enter new description: ");
-                    String newDesc = scanner.nextLine();
-                    editTask(editId, newDesc);
-                    break;
-                case 5:
-                    System.out.print("Enter task ID to delete: ");
-                    int deleteId = getIntInput();
-                    deleteTask(deleteId);
-                    break;
-                case 6:
-                    System.out.println("Thank you for using TODO List Manager. Goodbye!");
-                    scanner.close();
-                    return;
-                default:
-                    System.out.println("✗ Invalid option. Please try again.");
+                switch (choice) {
+                    case 1:
+                        System.out.print("Enter task description: ");
+                        String description = scanner.nextLine();
+                        addTask(description);
+                        break;
+                    case 2:
+                        viewTasks();
+                        break;
+                    case 3:
+                        viewTasks();
+                        if (!tasks.isEmpty()) {
+                            System.out.print("Enter task ID to complete: ");
+                            int completeId = getIntInput();
+                            completeTask(completeId);
+                        }
+                        break;
+                    case 4:
+                        viewTasks();
+                        if (!tasks.isEmpty()) {
+                            System.out.print("Enter task ID to edit: ");
+                            int editId = getIntInput();
+                            System.out.print("Enter new description: ");
+                            String newDesc = scanner.nextLine();
+                            editTask(editId, newDesc);
+                        }
+                        break;
+                    case 5:
+                        viewTasks();
+                        if (!tasks.isEmpty()) {
+                            System.out.print("Enter task ID to delete: ");
+                            int deleteId = getIntInput();
+                            deleteTask(deleteId);
+                        }
+                        break;
+                    case 6:
+                        System.out.println("Thank you for using TODO List Manager. Goodbye!");
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("X Invalid option. Please choose 1-6.");
+                }
+            } catch (Exception e) {
+                System.out.println("X An error occurred: " + e.getMessage());
+                scanner.nextLine(); // Clear buffer
             }
         }
+        scanner.close();
     }
 
     private int getIntInput() {
