@@ -8,7 +8,7 @@ import java.util.Scanner;
 /**
  * A simple command-line chat client.
  *
- * @author Jules
+ * @author Darshil
  * @version 1.0
  */
 public class ChatClient {
