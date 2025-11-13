@@ -4,7 +4,7 @@ import java.util.Scanner;
 /**
  * A simple console-based student management system.
  *
- * @author Jules
+ * @author Darshil
  * @version 1.0
  */
 public class StudentManagementSystem {
