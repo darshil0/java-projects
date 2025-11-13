@@ -8,7 +8,7 @@ import java.util.Stack;
  * A comprehensive command-line calculator with advanced features including
  * memory functions, history, parentheses support, and scientific operations.
  *
- * @author Jules
+ * @author Darshil
  * @version 2.0
  */
 public class Calculator {
