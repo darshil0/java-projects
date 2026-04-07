@@ -31,14 +31,14 @@ public class ChatClient {
             new Thread(() -> {
                 try {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    while (true) {
-                        String line = in.readLine();
-                        if (line != null && line.startsWith("MESSAGE")) {
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        if (line.startsWith("MESSAGE")) {
                             System.out.println(line.substring(8));
                         }
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("Connection lost: " + e.getMessage());
                 }
             }).start();
 
@@ -48,19 +48,22 @@ public class ChatClient {
             try (Scanner scanner = new Scanner(System.in)) {
                 // Prompt the user for a username
                 System.out.print("Enter your username: ");
-                String username = scanner.nextLine();
-                out.println(username);
+                if (scanner.hasNextLine()) {
+                    String username = scanner.nextLine();
+                    out.println(username);
 
-
-            // Create a PrintWriter to send messages to the server
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            // Create a Scanner to read input from the user
-            try (Scanner scanner = new Scanner(System.in)) {
-                // Loop to read messages from the user and send them to the server
-                while (scanner.hasNextLine()) {
-                    out.println(scanner.nextLine());
+                    // Loop to read messages from the user and send them to the server
+                    while (scanner.hasNextLine()) {
+                        String message = scanner.nextLine();
+                        if (message.equalsIgnoreCase("exit") || message.equalsIgnoreCase("quit")) {
+                            break;
+                        }
+                        out.println(message);
+                    }
                 }
             }
+        } catch (IOException e) {
+            System.err.println("Could not connect to server: " + e.getMessage());
         }
     }
 }

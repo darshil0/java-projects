@@ -21,7 +21,7 @@ public class StudentManagementSystem {
         // Create a Scanner object to read input from the user.
         try (Scanner scanner = new Scanner(System.in)) {
             // Variable to store the user's choice.
-            int choice;
+            int choice = 0;
             // Counter for student IDs.
             int nextId = 1;
 
@@ -37,15 +37,13 @@ public class StudentManagementSystem {
 
                 // Get the user's choice.
                 try {
-                    choice = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character
-                } catch (java.util.InputMismatchException e) {
-                    System.out.println("Invalid choice. Please try again.");
-                    scanner.nextLine(); // Consume the invalid input
+                    String input = scanner.nextLine().trim();
+                    if (input.isEmpty()) continue;
+                    choice = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid choice. Please enter a number.");
                     continue;
                 }
-                choice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline character
 
                 // Use a switch statement to perform actions based on the user's choice.
                 switch (choice) {
@@ -60,20 +58,24 @@ public class StudentManagementSystem {
                         break;
                     case 2:
                         // Remove a student.
-                        System.out.println("Current students:");
-                        viewStudents(students);
-                        System.out.print("Enter the ID of the student to remove: ");
-                    try {
-                        int idToRemove = scanner.nextInt();
-                        students.removeIf(student -> student.getId() == idToRemove);
-                        System.out.println("Student removed successfully.");
-                    } catch (java.util.InputMismatchException e) {
-                        System.out.println("Invalid ID. Please try again.");
-                        scanner.nextLine(); // Consume the invalid input
-                    }
-                        int idToRemove = scanner.nextInt();
-                        students.removeIf(student -> student.getId() == idToRemove);
-                        System.out.println("Student removed successfully.");
+                        if (students.isEmpty()) {
+                            System.out.println("No students to remove.");
+                        } else {
+                            System.out.println("Current students:");
+                            viewStudents(students);
+                            System.out.print("Enter the ID of the student to remove: ");
+                            try {
+                                int idToRemove = Integer.parseInt(scanner.nextLine().trim());
+                                boolean removed = students.removeIf(student -> student.getId() == idToRemove);
+                                if (removed) {
+                                    System.out.println("Student removed successfully.");
+                                } else {
+                                    System.out.println("Student with ID " + idToRemove + " not found.");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid ID. Please enter a number.");
+                            }
+                        }
                         break;
                     case 3:
                         // View all students.

@@ -25,16 +25,13 @@ public class ChatServer {
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running on port " + PORT);
         // Create a new server socket
-        ServerSocket listener = new ServerSocket(PORT);
-
-        try {
+        try (ServerSocket listener = new ServerSocket(PORT)) {
             while (true) {
                 // Wait for a client to connect and create a new thread for them
                 new Handler(listener.accept()).start();
             }
-        } finally {
-            // Close the server socket
-            listener.close();
+        } catch (IOException e) {
+            System.err.println("Server error: " + e.getMessage());
         }
     }
 
@@ -60,47 +57,50 @@ public class ChatServer {
          * The main method for the handler thread.
          */
         public void run() {
+            String username = null;
             try {
                 // Initialize input and output streams for the client socket
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                // Add the client's print writer to the set of all writers so they can receive
-                // messages.
-                synchronized (clientWriters) {
-                    clientWriters.add(out);
-                }
-
                 // Get a username for this client.
-                String username = in.readLine();
-                if (username == null) {
+                username = in.readLine();
+                if (username == null || username.trim().isEmpty()) {
                     return;
                 }
+
                 // Add the client's print writer to the set of all writers so they can receive
                 // messages.
                 synchronized (clientWriters) {
                     clientWriters.add(out);
                 }
 
+                System.out.println(username + " joined the chat.");
+
                 // Accept messages from this client and broadcast them.
-                while (true) {
-                    String input = in.readLine();
-                    if (input == null) {
-                        return; // Client disconnected
+                String input;
+                while ((input = in.readLine()) != null) {
+                    if (input.equalsIgnoreCase("exit") || input.equalsIgnoreCase("quit")) {
+                        break;
                     }
                     // Broadcast the received message to all other clients
-                    for (PrintWriter writer : clientWriters) {
-                        writer.println("MESSAGE " + username + ": " + input);
+                    synchronized (clientWriters) {
+                        for (PrintWriter writer : clientWriters) {
+                            writer.println("MESSAGE " + username + ": " + input);
+                        }
                     }
                 }
             } catch (IOException e) {
-                System.out.println(e);
+                System.out.println("Error with client " + (username != null ? username : "unknown") + ": " + e);
             } finally {
                 // This client is going down! Remove its print writer and close its socket.
                 if (out != null) {
                     synchronized (clientWriters) {
                         clientWriters.remove(out);
                     }
+                }
+                if (username != null) {
+                    System.out.println(username + " left the chat.");
                 }
                 try {
                     socket.close();
