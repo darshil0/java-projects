@@ -8,7 +8,7 @@ import java.util.Scanner;
  * Based on the grounded evidence from the misc directory.
  *
  * @author Jules
- * @version 1.0
+ * @version 1.1
  */
 public class TeaRecipeManager {
 
@@ -22,8 +22,8 @@ public class TeaRecipeManager {
     private void loadDefaultRecipe() {
         Recipe tea = new Recipe("Classic Ginger Tea");
         tea.addIngredient("2 tablespoons of tea");
-        tea.addIngredient("3 Cups of Water");
-        tea.addIngredient("1 tablespoon of Ginger Powder");
+        tea.addIngredient("3 cups of water");
+        tea.addIngredient("1 tablespoon of ginger powder");
         tea.addIngredient("Milk");
 
         tea.addStep("Heat the mixture of tea, water, and ginger powder for 10-15 minutes.");
@@ -44,32 +44,33 @@ public class TeaRecipeManager {
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
-        int choice = 0;
+        try (Scanner scanner = new Scanner(System.in)) {
+            int choice = 0;
 
-        while (choice != 3) {
-            showMenu();
-            try {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) continue;
-                choice = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number.");
-                continue;
-            }
+            while (choice != 3) {
+                showMenu();
+                try {
+                    String input = scanner.nextLine().trim();
+                    if (input.isEmpty()) continue;
+                    choice = Integer.parseInt(input);
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a valid number.");
+                    continue;
+                }
 
-            switch (choice) {
-                case 1:
-                    viewRecipes();
-                    break;
-                case 2:
-                    addNewRecipe(scanner);
-                    break;
-                case 3:
-                    System.out.println("Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid option.");
+                switch (choice) {
+                    case 1:
+                        viewRecipes();
+                        break;
+                    case 2:
+                        addNewRecipe(scanner);
+                        break;
+                    case 3:
+                        System.out.println("Goodbye!");
+                        break;
+                    default:
+                        System.out.println("Invalid option.");
+                }
             }
         }
     }
