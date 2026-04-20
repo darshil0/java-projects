@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-04-20
+
+### Fixed
+- **TeaRecipeManager**: Fixed resource leak by properly closing Scanner using try-with-resources
+- **TeaRecipeManager**: Fixed spelling inconsistencies in default recipe (capitalization of "cups", "ginger powder")
+- **Documentation**: Fixed typo "ingrediants" → "ingredients" in Tea Project reference
+- **misc/Tea Project**: Fixed multiple spelling errors ("ingrediants" → "ingredients", "Server" → "Serve")
+
 ## [1.1.0] - 2025-04-07
 
 ### Added
